@@ -1,0 +1,31 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    container_name: "postgres"
+    hostname: postgres
+    ports:
+      - "64543:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Nikra987!
+      POSTGRES_DB: PatientDB
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+  patientApi:
+    build: 
+        context: /PatientApp/PatientAppApi/PatientApp
+        dockerfile: Dockerfile
+    image: paapiimage
+    container_name: "patientApi"
+    ports:
+      - "2001:444"
+  patientFlut:
+    build: /PatientApp/patientapp .
+    image: paflutterimage
+    container_name: "patientFrontEnd"
+    ports:
+      - "4201:4201"
+volumes:
+  postgres-data:
