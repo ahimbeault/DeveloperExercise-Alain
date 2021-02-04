@@ -1,6 +1,5 @@
 import 'package:flutter_guid/flutter_guid.dart';
 import 'package:patientapp/classes/enumerations.dart';
-import 'package:patientapp/models/patient.dart';
 
 class Phone {
   Guid phoneId;

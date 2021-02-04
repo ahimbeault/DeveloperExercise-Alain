@@ -1,5 +1,3 @@
-import 'dart:js';
-import 'package:patientapp/api%20services/api-phone.dart';
 import 'package:patientapp/models/patient.dart';
 import 'package:patientapp/models/phone.dart';
 import 'package:patientapp/api services/api-patient.dart';

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:patientapp/classes/patientData.dart';
-import 'package:patientapp/main.dart';
 import 'package:patientapp/models/patient.dart';
 import 'package:patientapp/classes/addPatientDialog.dart';
 import 'package:patientapp/widgets/kewl-textfield.dart';
