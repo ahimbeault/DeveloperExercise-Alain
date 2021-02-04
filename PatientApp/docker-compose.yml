@@ -15,14 +15,14 @@ services:
     restart: unless-stopped
   patientApi:
     build: 
-        context: /PatientApp/PatientAppApi/PatientApp
+        context: ./PatientAppApi/PatientApp
         dockerfile: Dockerfile
     image: paapiimage
     container_name: "patientApi"
     ports:
       - "2001:444"
   patientFlut:
-    build: /PatientApp/patientapp .
+    build: ./patientapp .
     image: paflutterimage
     container_name: "patientFrontEnd"
     ports:
