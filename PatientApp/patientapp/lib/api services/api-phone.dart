@@ -18,7 +18,7 @@ Future<List<Phone>> getPatientPhones(Guid patientId) async {
           .map((phone) => new Phone.fromJson(phone))
           .toList();
     } else {
-      throw Exception('Failed to get Patients');
+      throw Exception('Failed to get phones');
     }
   } catch (e) {
     throw Exception(e);

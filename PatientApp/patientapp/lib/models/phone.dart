@@ -1,5 +1,6 @@
 import 'package:flutter_guid/flutter_guid.dart';
 import 'package:patientapp/classes/enumerations.dart';
+import 'package:flutter/material.dart';
 
 class Phone {
   Guid phoneId;
@@ -8,34 +9,39 @@ class Phone {
   Guid patientId;
 
   Phone({
-    this.phoneId,
-    this.phoneType,
-    this.phoneNumber,
-    this.patientId,
-  });
+    Guid phoneId,
+    @required PhoneType phoneType,
+    @required String phoneNumber,
+    Guid patientId,
+  })  : this.phoneId = phoneId,
+        this.phoneType = phoneType,
+        this.phoneNumber = phoneNumber,
+        this.patientId = patientId;
 
   factory Phone.fromJson(Map<String, dynamic> json) {
+    PhoneType phoneType;
+    int phoneTypeInt = json['phoneType'];
+    switch (phoneTypeInt) {
+      case 0:
+        phoneType = PhoneType.Cell;
+        break;
+      case 1:
+        phoneType = PhoneType.Home;
+        break;
+      case 2:
+        phoneType = PhoneType.Work;
+        break;
+      default:
+        phoneType = PhoneType.Cell;
+        break;
+    }
+
     Phone phone = new Phone(
       phoneId: new Guid(json['phoneId']),
+      phoneType: phoneType,
       phoneNumber: json['phoneNumber'],
       patientId: new Guid(json['patientId']),
     );
-
-    int phoneType = json['phoneType'];
-    switch (phoneType) {
-      case 0:
-        phone.phoneType = PhoneType.Cell;
-        break;
-      case 1:
-        phone.phoneType = PhoneType.Home;
-        break;
-      case 2:
-        phone.phoneType = PhoneType.Work;
-        break;
-      default:
-        phone.phoneType = PhoneType.Cell;
-        break;
-    }
 
     return phone;
   }
@@ -50,19 +56,11 @@ class Phone {
       phoneTypeString = '2';
     }
 
-    if (phoneId != null) {
-      return {
-        'phoneId': phoneId.toString(),
-        'phoneType': phoneTypeString,
-        'phoneNumber': phoneNumber,
-        'patientId': patientId.toString(),
-      };
-    } else {
-      return {
-        'phoneType': phoneTypeString,
-        'phoneNumber': phoneNumber,
-        'patientId': patientId.toString(),
-      };
-    }
+    return {
+      if (phoneId != null) 'phoneId': phoneId.toString() else 'phoneId': null,
+      'phoneType': phoneTypeString,
+      'phoneNumber': phoneNumber,
+      'patientId': patientId.toString(),
+    };
   }
 }

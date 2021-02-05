@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:patientapp/classes/patientData.dart';
+import 'package:patientapp/widgets/patient/patientBody.dart';
 import 'package:patientapp/models/patient.dart';
-import 'package:patientapp/classes/addPatientDialog.dart';
-import 'package:patientapp/widgets/kewl-textfield.dart';
+import 'package:patientapp/widgets/patient/addPatientDialog.dart';
+import 'package:patientapp/widgets/shared/kewl-textfield.dart';
 import 'package:patientapp/api services/api-patient.dart';
 
 class OptionPanel extends StatefulWidget {
@@ -11,9 +11,9 @@ class OptionPanel extends StatefulWidget {
 }
 
 class _OptionPanelState extends State<OptionPanel> {
-  TextEditingController searchboxController = new TextEditingController();
-  bool includeDeleted = false;
-  String searchText = '';
+  TextEditingController _searchboxController = new TextEditingController();
+  bool _includeDeleted = false;
+  String _searchText = '';
 
   @override
   void initState() {
@@ -48,7 +48,7 @@ class _OptionPanelState extends State<OptionPanel> {
                 Icons.search,
                 color: Colors.white,
               ),
-              textController: searchboxController,
+              textController: _searchboxController,
               margin: EdgeInsets.only(bottom: 15.0),
               onChanged: searchTextChanged,
               maxTextCharacters: 50,
@@ -59,10 +59,10 @@ class _OptionPanelState extends State<OptionPanel> {
               child: CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.leading,
                 title: Text('Include Deleted'),
-                value: includeDeleted,
+                value: _includeDeleted,
                 onChanged: (value) {
                   setState(() {
-                    includeDeleted = !includeDeleted;
+                    _includeDeleted = !_includeDeleted;
                     includeDeletedChanged();
                   });
                 },
@@ -98,16 +98,17 @@ class _OptionPanelState extends State<OptionPanel> {
   }
 
   void searchTextChanged(text) {
-    Future<List<Patient>> patients = searchPatients(includeDeleted, text);
+    Future<List<Patient>> patients = searchPatients(_includeDeleted, text);
     setState(() {
-      searchText = text;
+      _searchText = text;
     });
     // Tell the parent its data has changed and force a re-render
     PatientData.of(context).setPatients(patients, null);
   }
 
   void includeDeletedChanged() {
-    Future<List<Patient>> patients = searchPatients(includeDeleted, searchText);
+    Future<List<Patient>> patients =
+        searchPatients(_includeDeleted, _searchText);
 
     // Tell the parent its data has changed and force a re-render
     PatientData.of(context).setPatients(patients, null);

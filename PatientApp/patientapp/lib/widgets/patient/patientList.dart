@@ -1,5 +1,5 @@
 import 'package:patientapp/models/patient.dart';
-import 'package:patientapp/classes/patientData.dart';
+import 'package:patientapp/widgets/patient/patientBody.dart';
 import 'package:flutter/material.dart';
 
 class PatientList extends StatefulWidget {
@@ -16,41 +16,14 @@ class PatientList extends StatefulWidget {
 }
 
 class _PatientListState extends State<PatientList> {
-  Patient currentPatient;
-
-  Widget _buildPatientRow(Patient patient) {
-    return Container(
-      color: (currentPatient != null &&
-              patient.patientId == currentPatient.patientId)
-          ? Colors.blue.withOpacity(0.5)
-          : Colors.transparent,
-      child: ListTile(
-        title: Text(
-          patient.firstName + " " + patient.lastName,
-        ),
-        onTap: () => {
-          setCurrentPatient(patient),
-        },
-      ),
-    );
-  }
-
-  void setCurrentPatient(Patient patient) {
-    //tell parent data has changed
-    if (patient != null) {
-      PatientData.of(context).setCurrentPatient(patient);
-      setState(() {
-        currentPatient = patient;
-      });
-    }
-  }
+  Patient _currentPatient;
 
   @override
   void initState() {
     super.initState();
 
-    if (currentPatient != null) {
-      currentPatient = widget.currentPatient;
+    if (_currentPatient != null) {
+      _currentPatient = widget.currentPatient;
     }
   }
 
@@ -72,5 +45,32 @@ class _PatientListState extends State<PatientList> {
             }),
       ),
     );
+  }
+
+  Widget _buildPatientRow(Patient patient) {
+    return Container(
+      color: (_currentPatient != null &&
+              patient.patientId == _currentPatient.patientId)
+          ? Colors.blue.withOpacity(0.5)
+          : Colors.transparent,
+      child: ListTile(
+        title: Text(
+          patient.firstName + " " + patient.lastName,
+        ),
+        onTap: () => {
+          setCurrentPatient(patient),
+        },
+      ),
+    );
+  }
+
+  void setCurrentPatient(Patient patient) {
+    //tell parent data has changed
+    if (patient != null) {
+      PatientData.of(context).setCurrentPatient(patient);
+      setState(() {
+        _currentPatient = patient;
+      });
+    }
   }
 }

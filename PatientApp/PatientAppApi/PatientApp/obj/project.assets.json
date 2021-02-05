@@ -5508,11 +5508,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\PatientApp\\PatientAppApi\\PatientApp\\PatientApp.csproj",
+      "projectUniqueName": "E:\\Source\\DeveloperExercise-Alain\\PatientApp\\PatientAppApi\\PatientApp\\PatientApp.csproj",
       "projectName": "PatientApp",
-      "projectPath": "E:\\PatientApp\\PatientAppApi\\PatientApp\\PatientApp.csproj",
+      "projectPath": "E:\\Source\\DeveloperExercise-Alain\\PatientApp\\PatientAppApi\\PatientApp\\PatientApp.csproj",
       "packagesPath": "C:\\Users\\Lanigan\\.nuget\\packages\\",
-      "outputPath": "E:\\PatientApp\\PatientAppApi\\PatientApp\\obj\\",
+      "outputPath": "E:\\Source\\DeveloperExercise-Alain\\PatientApp\\PatientAppApi\\PatientApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"

@@ -1,68 +1,41 @@
 import 'package:patientapp/models/patient.dart';
-import 'package:patientapp/widgets/kewl-textfield.dart';
-import 'package:patientapp/widgets/kewl-button.dart';
+import 'package:patientapp/widgets/shared/kewl-textfield.dart';
+import 'package:patientapp/widgets/shared/kewl-button.dart';
 import 'package:patientapp/api services/api-patient.dart';
 import 'package:flutter/material.dart';
 
-class ConfirmDeletionDialog extends StatefulWidget {
-  final Patient patient;
-
-  ConfirmDeletionDialog({
-    Patient patient,
-  }) : this.patient = patient;
-
+class AddPatientDialog extends StatefulWidget {
   @override
-  _ConfirmDeletionDialogState createState() => _ConfirmDeletionDialogState();
+  _AddPatientDialogState createState() => _AddPatientDialogState();
 }
 
-class _ConfirmDeletionDialogState extends State<ConfirmDeletionDialog> {
-  TextEditingController nameTextController;
+class _AddPatientDialogState extends State<AddPatientDialog> {
+  TextEditingController _firstNameTextController;
+  TextEditingController _lastNameTextController;
+  Future<bool> _saveResult;
+  bool _isDisabled = true;
+  bool _isLoading = false;
+  Patient _newPatient;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  Future<bool> saveResult;
-  bool isDisabled = true;
-  bool isLoading = false;
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    nameTextController.dispose();
-  }
 
   @override
   void initState() {
     super.initState();
 
-    nameTextController = TextEditingController(text: '');
+    _newPatient = new Patient(
+      lastName: '',
+    );
+
+    _firstNameTextController = TextEditingController(text: '');
+    _lastNameTextController = TextEditingController(text: '');
   }
 
-  void dismissDialog(BuildContext context, bool opResult) {
-    if (opResult) {
-      setState(() {
-        isLoading = true;
-      });
-      saveResult = deletePatient(widget.patient);
-    } else {
-      Navigator.pop(context, false);
-    }
-  }
+  @override
+  void dispose() {
+    super.dispose();
 
-  String validateName(String value) {
-    String retval;
-    if (value.isEmpty) {
-      retval = 'Enter the patient\'s name';
-    } else if (value !=
-        widget.patient.firstName + ' ' + widget.patient.lastName) {
-      retval = 'Patient name does not match';
-    }
-    return retval;
-  }
-
-  void formDataChanged(String value) {
-    setState(() {
-      isDisabled = !_formKey.currentState.validate();
-    });
+    _firstNameTextController.dispose();
+    _lastNameTextController.dispose();
   }
 
   @override
@@ -84,14 +57,14 @@ class _ConfirmDeletionDialogState extends State<ConfirmDeletionDialog> {
                 padding: EdgeInsets.all(0.0),
                 margin: EdgeInsets.all(0.0),
                 width: 500.0,
-                height: 300.0,
+                height: 350.0,
                 color: Colors.white,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     SizedBox(height: 20),
                     Center(
-                      child: Text('Confirm Deletion'),
+                      child: Text('Add New Patient'),
                     ),
                     Divider(
                       color: Colors.blue,
@@ -102,21 +75,34 @@ class _ConfirmDeletionDialogState extends State<ConfirmDeletionDialog> {
                       child: Column(
                         children: [
                           KewlTextField(
-                            labelText: 'Patient Name',
-                            hintText: widget.patient.firstName +
-                                ' ' +
-                                widget.patient.lastName,
+                            labelText: 'First Name',
+                            hintText: 'Enter patient\'s first name',
                             minWidth: 300,
                             prefixIcon: Icon(
                               Icons.person,
                               color: Colors.indigo,
                             ),
-                            textController: nameTextController,
+                            textController: _firstNameTextController,
                             margin: EdgeInsets.only(bottom: 15.0),
-                            onValidate: validateName,
+                            onValidate: validateFirstName,
                             onChanged: formDataChanged,
-                            maxTextCharacters: 110,
-                            displayMaxCharacterValidation: false,
+                            maxTextCharacters: 50,
+                            displayMaxCharacterValidation: true,
+                          ),
+                          KewlTextField(
+                            labelText: 'Last Name',
+                            hintText: 'Enter patient\'s last name',
+                            minWidth: 300,
+                            prefixIcon: Icon(
+                              Icons.person,
+                              color: Colors.indigo,
+                            ),
+                            textController: _lastNameTextController,
+                            margin: EdgeInsets.only(bottom: 15.0),
+                            onValidate: validateLastName,
+                            onChanged: formDataChanged,
+                            maxTextCharacters: 50,
+                            displayMaxCharacterValidation: true,
                           ),
                         ],
                       ),
@@ -130,12 +116,12 @@ class _ConfirmDeletionDialogState extends State<ConfirmDeletionDialog> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               KewlButton(
-                                buttonText: 'Delete',
+                                buttonText: 'Save',
                                 callback: () {
                                   dismissDialog(context, true);
                                 },
                                 margin: EdgeInsets.only(right: 10.0),
-                                isDisabled: isDisabled,
+                                isDisabled: _isDisabled,
                               ),
                               KewlButton(
                                 buttonText: 'Cancel',
@@ -154,24 +140,24 @@ class _ConfirmDeletionDialogState extends State<ConfirmDeletionDialog> {
               ),
             ),
           ),
-          (isLoading)
+          (_isLoading)
               ? FutureBuilder<bool>(
-                  future: saveResult,
+                  future: _saveResult,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (isLoading) {
+                        if (_isLoading) {
                           setState(() {
-                            isLoading = false;
+                            _isLoading = false;
                           });
-                          Navigator.pop(context, true);
+                          Navigator.pop(context, _newPatient);
                         }
                       });
                     } else if (snapshot.hasError) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (isLoading) {
+                        if (_isLoading) {
                           setState(() {
-                            isLoading = false;
+                            _isLoading = false;
                           });
                         }
                       });
@@ -187,5 +173,44 @@ class _ConfirmDeletionDialogState extends State<ConfirmDeletionDialog> {
         ],
       ),
     );
+  }
+
+  String validateFirstName(String value) {
+    String retval;
+    if (value.isEmpty) {
+      _newPatient.firstName = value;
+      retval = 'First Name is a required field';
+    } else if (value != _newPatient.firstName) {
+      _newPatient.firstName = value;
+    }
+    return retval;
+  }
+
+  String validateLastName(String value) {
+    String retval;
+    if (value.isEmpty) {
+      _newPatient.lastName = value;
+      retval = 'Last Name is a required field';
+    } else if (value != _newPatient.lastName) {
+      _newPatient.lastName = value;
+    }
+    return retval;
+  }
+
+  void formDataChanged(String value) {
+    setState(() {
+      _isDisabled = !_formKey.currentState.validate();
+    });
+  }
+
+  void dismissDialog(BuildContext context, bool opResult) {
+    if (opResult) {
+      setState(() {
+        _isLoading = true;
+      });
+      _saveResult = postPatient(_newPatient);
+    } else {
+      Navigator.pop(context, null);
+    }
   }
 }

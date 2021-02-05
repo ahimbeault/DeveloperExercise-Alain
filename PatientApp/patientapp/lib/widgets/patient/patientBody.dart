@@ -1,9 +1,9 @@
 import 'package:patientapp/models/patient.dart';
 import 'package:patientapp/models/phone.dart';
 import 'package:patientapp/api services/api-patient.dart';
-import 'package:patientapp/widgets/patientList.dart';
-import 'package:patientapp/widgets/optionsPanel.dart';
-import 'package:patientapp/widgets/patientDetails.dart';
+import 'package:patientapp/widgets/patient/patientList.dart';
+import 'package:patientapp/widgets/patient/patientOptionsPanel.dart';
+import 'package:patientapp/widgets/patient/patientDetails.dart';
 import 'package:flutter/material.dart';
 
 class PatientData extends StatefulWidget {
@@ -18,17 +18,17 @@ class PatientData extends StatefulWidget {
 }
 
 class _PatientDataState extends State<PatientData> {
-  bool includeDeleted = false;
-  Future<List<Patient>> patients;
-  Patient currentPatient;
+  bool _includeDeleted = false;
+  Future<List<Patient>> _patients;
+  Patient _currentPatient;
 
-  Patient get getCurrentPatient => currentPatient;
+  Patient get getCurrentPatient => _currentPatient;
 
   @override
   void initState() {
-    patients = getPatients(includeDeleted);
+    _patients = getPatients(_includeDeleted);
     List<Phone> phones = [];
-    currentPatient = new Patient(
+    _currentPatient = new Patient(
       firstName: '',
       lastName: '',
       email: '',
@@ -37,57 +37,6 @@ class _PatientDataState extends State<PatientData> {
     );
 
     super.initState();
-  }
-
-  void refreshPatients() {
-    setState(() {
-      patients = getPatients(includeDeleted);
-    });
-  }
-
-  void refreshCurrentPatient() async {
-    Patient patient = await getPatient(currentPatient.patientId);
-    setState(() {
-      currentPatient = patient;
-    });
-  }
-
-  void updatePatient(Patient patient) {
-    setState(() {
-      patients = getPatients(includeDeleted);
-      currentPatient = patient;
-    });
-  }
-
-  void setCurrentPatient(Patient patient) {
-    setState(() {
-      currentPatient = patient;
-    });
-  }
-
-  void setPatients(Future<List<Patient>> patients, Patient currentPatient) {
-    setState(() {
-      this.patients = patients;
-      if (currentPatient != null) {
-        this.currentPatient = currentPatient;
-      }
-    });
-  }
-
-  Widget loading() {
-    return Container(
-      width: 300.0,
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              top: 30.0,
-            ),
-            child: CircularProgressIndicator(),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -113,7 +62,7 @@ class _PatientDataState extends State<PatientData> {
                   children: [
                     Expanded(
                       child: FutureBuilder<List<Patient>>(
-                        future: patients,
+                        future: _patients,
                         builder: (context, snapshot) {
                           Widget retval = loading();
                           if (snapshot.hasData) {
@@ -122,7 +71,7 @@ class _PatientDataState extends State<PatientData> {
                             } else {
                               retval = PatientList(
                                 patients: snapshot.data,
-                                currentPatient: currentPatient,
+                                currentPatient: _currentPatient,
                               );
                             }
                           } else if (snapshot.hasError) {
@@ -132,13 +81,64 @@ class _PatientDataState extends State<PatientData> {
                         },
                       ),
                     ),
-                    PatientDetails(currentPatient: this.currentPatient),
+                    PatientDetails(currentPatient: this._currentPatient),
                   ],
                 ),
               ),
             ]),
       ),
       patientData: this,
+    );
+  }
+
+  void refreshPatients() {
+    setState(() {
+      _patients = getPatients(_includeDeleted);
+    });
+  }
+
+  void refreshCurrentPatient() async {
+    Patient patient = await getPatient(_currentPatient.patientId);
+    setState(() {
+      _currentPatient = patient;
+    });
+  }
+
+  void updatePatient(Patient patient) {
+    setState(() {
+      _patients = getPatients(_includeDeleted);
+      _currentPatient = patient;
+    });
+  }
+
+  void setCurrentPatient(Patient patient) {
+    setState(() {
+      _currentPatient = patient;
+    });
+  }
+
+  void setPatients(Future<List<Patient>> patients, Patient currentPatient) {
+    setState(() {
+      this._patients = patients;
+      if (currentPatient != null) {
+        this._currentPatient = currentPatient;
+      }
+    });
+  }
+
+  Widget loading() {
+    return Container(
+      width: 300.0,
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              top: 30.0,
+            ),
+            child: CircularProgressIndicator(),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:patientapp/classes/patientData.dart';
+import 'package:patientapp/widgets/patient/patientBody.dart';
 import 'package:patientapp/models/patient.dart';
-import 'package:patientapp/widgets/kewl-textfield.dart';
-import 'package:patientapp/widgets/kewl-button.dart';
+import 'package:patientapp/widgets/shared/kewl-textfield.dart';
+import 'package:patientapp/widgets/shared/kewl-button.dart';
 import 'package:patientapp/api services/api-patient.dart';
-import 'package:patientapp/api services/api-phone.dart';
-import 'package:patientapp/widgets/patientPhones.dart';
+import 'package:patientapp/widgets/phone/patientPhones.dart';
 import 'package:patientapp/models/phone.dart';
-import 'package:patientapp/classes/confirmDeletionDialog.dart';
+import 'package:patientapp/widgets/patient/confirmDeletionDialog.dart';
 
 class PatientDetails extends StatefulWidget {
   final Patient currentPatient;
@@ -20,21 +19,18 @@ class PatientDetails extends StatefulWidget {
 }
 
 class _PatientDetailsState extends State<PatientDetails> {
-  TextEditingController firstNameTextController;
-  TextEditingController lastNameTextController;
-  TextEditingController emailTextController;
-
-  bool isDisabled = true;
-  bool isLoading = false;
-  Patient currentPatient;
-
+  TextEditingController _firstNameTextController;
+  TextEditingController _lastNameTextController;
+  TextEditingController _emailTextController;
+  bool _isDisabled = true;
+  Patient _currentPatient;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
 
-    currentPatient = new Patient(
+    _currentPatient = new Patient(
       patientId: widget.currentPatient.patientId,
       firstName: widget.currentPatient.firstName,
       lastName: widget.currentPatient.lastName,
@@ -43,13 +39,13 @@ class _PatientDetailsState extends State<PatientDetails> {
       phones: widget.currentPatient.phones,
     );
 
-    firstNameTextController =
-        TextEditingController(text: currentPatient.firstName);
+    _firstNameTextController =
+        TextEditingController(text: _currentPatient.firstName);
 
-    lastNameTextController =
-        TextEditingController(text: currentPatient.lastName);
+    _lastNameTextController =
+        TextEditingController(text: _currentPatient.lastName);
 
-    emailTextController = TextEditingController(text: currentPatient.email);
+    _emailTextController = TextEditingController(text: _currentPatient.email);
   }
 
   @override
@@ -61,7 +57,7 @@ class _PatientDetailsState extends State<PatientDetails> {
 
     patient = PatientData.of(context).getCurrentPatient;
 
-    currentPatient = new Patient(
+    _currentPatient = new Patient(
       patientId: patient.patientId,
       firstName: patient.firstName,
       lastName: patient.lastName,
@@ -69,118 +65,22 @@ class _PatientDetailsState extends State<PatientDetails> {
       isDeleted: patient.isDeleted,
       phones: patient.phones,
     );
-    firstNameTextController =
-        TextEditingController(text: currentPatient.firstName);
+    _firstNameTextController =
+        TextEditingController(text: _currentPatient.firstName);
 
-    lastNameTextController =
-        TextEditingController(text: currentPatient.lastName);
+    _lastNameTextController =
+        TextEditingController(text: _currentPatient.lastName);
 
-    emailTextController = TextEditingController(text: currentPatient.email);
-    isDisabled = true;
+    _emailTextController = TextEditingController(text: _currentPatient.email);
+    _isDisabled = true;
   }
 
   @override
   void dispose() {
     super.dispose();
 
-    firstNameTextController.dispose();
-    lastNameTextController.dispose();
-  }
-
-  String validateFirstName(String value) {
-    String retval;
-    if (value.isEmpty) {
-      currentPatient.firstName = value;
-      retval = 'First Name is a required field';
-    } else if (value != currentPatient.firstName) {
-      currentPatient.firstName = value;
-    }
-    return retval;
-  }
-
-  String validateLastName(String value) {
-    String retval;
-    if (value.isEmpty) {
-      currentPatient.lastName = value;
-      retval = 'Last Name is a required field';
-    } else if (value != currentPatient.lastName) {
-      currentPatient.lastName = value;
-    }
-    return retval;
-  }
-
-  String validateEmail(String value) {
-    String retval;
-    String pattern =
-        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
-    RegExp regExp = new RegExp(pattern);
-    if (!regExp.hasMatch(value)) {
-      retval = 'Please enter valid email';
-    } else if (value != currentPatient.email) {
-      currentPatient.email = value;
-    }
-    return retval;
-  }
-
-  void formDataChanged(String value) {
-    setState(() {
-      isDisabled = !_formKey.currentState.validate();
-    });
-  }
-
-  void updatePatient() async {
-    bool saveResult;
-    saveResult = await putPatient(currentPatient);
-    if (saveResult) {
-      Future<List<Patient>> patients = searchPatients(false, '');
-
-      // Tell the parent its data has changed and force a re-render
-      PatientData.of(context).setPatients(patients, currentPatient);
-
-      setState(() {
-        isDisabled = true;
-      });
-    }
-  }
-
-  void refreshPatient() {
-    PatientData.of(context).refreshCurrentPatient();
-  }
-
-  void delete() async {
-    bool saveResult;
-
-    saveResult = await showGeneralDialog(
-        barrierColor: Colors.black.withOpacity(0.3),
-        transitionBuilder: (context, a1, a2, widget) {
-          return Transform(
-            transform: Matrix4.translationValues(0.0, 200, 0.0),
-            child: ConfirmDeletionDialog(patient: currentPatient),
-          );
-        },
-        transitionDuration: Duration(milliseconds: 400),
-        barrierDismissible: false,
-        barrierLabel: '',
-        context: context,
-        pageBuilder: (context, animation1, animation2) {
-          return SizedBox(height: 20.0);
-        });
-    if (saveResult) {
-      Future<List<Patient>> patients = searchPatients(false, '');
-
-      // Tell the parent its data has changed and force a re-render
-      PatientData.of(context).setPatients(patients, currentPatient);
-      PatientData.of(context).refreshCurrentPatient();
-      setState(() {
-        isDisabled = true;
-      });
-    }
-  }
-
-  void setPatientPhones(Future<List<Phone>> phones) {
-    setState(() {
-      phones = phones;
-    });
+    _firstNameTextController.dispose();
+    _lastNameTextController.dispose();
   }
 
   @override
@@ -188,9 +88,8 @@ class _PatientDetailsState extends State<PatientDetails> {
     return Container(
       padding: EdgeInsets.all(0.0),
       margin: EdgeInsets.all(0.0),
-      width: 1000.0,
-      height: 600.0,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Form(
             key: _formKey,
@@ -220,7 +119,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                                   margin: EdgeInsets.all(10.0),
                                   child: Text(
                                     'Patient Id: ' +
-                                        currentPatient.patientId.toString(),
+                                        _currentPatient.patientId.toString(),
                                     style: TextStyle(
                                         fontSize: 20, color: Colors.blue),
                                   )),
@@ -240,17 +139,17 @@ class _PatientDetailsState extends State<PatientDetails> {
                                     ),
                                   ),
                                   Container(
-                                    child: (currentPatient.isDeleted)
+                                    child: (_currentPatient.isDeleted)
                                         ? Center(child: Text('Inactive'))
                                         : Center(child: Text('Active')),
                                     width: 55.0,
                                     height: 50.0,
                                     decoration: BoxDecoration(
-                                      color: (currentPatient.isDeleted)
+                                      color: (_currentPatient.isDeleted)
                                           ? Colors.red
                                           : Colors.green,
                                       border: Border.all(
-                                        color: (currentPatient.isDeleted)
+                                        color: (_currentPatient.isDeleted)
                                             ? Colors.red
                                             : Colors.green,
                                       ),
@@ -270,7 +169,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                                   Icons.person,
                                   color: Colors.indigo,
                                 ),
-                                textController: firstNameTextController,
+                                textController: _firstNameTextController,
                                 margin: EdgeInsets.only(bottom: 15.0),
                                 onValidate: validateFirstName,
                                 onChanged: formDataChanged,
@@ -285,7 +184,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                                   Icons.person,
                                   color: Colors.indigo,
                                 ),
-                                textController: lastNameTextController,
+                                textController: _lastNameTextController,
                                 margin: EdgeInsets.only(bottom: 15.0),
                                 onValidate: validateLastName,
                                 onChanged: formDataChanged,
@@ -300,7 +199,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                                   Icons.email,
                                   color: Colors.indigo,
                                 ),
-                                textController: emailTextController,
+                                textController: _emailTextController,
                                 margin: EdgeInsets.only(bottom: 15.0),
                                 onValidate: validateEmail,
                                 onChanged: formDataChanged,
@@ -325,7 +224,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                               updatePatient();
                             },
                             margin: EdgeInsets.only(right: 10.0),
-                            isDisabled: isDisabled,
+                            isDisabled: _isDisabled,
                           ),
                           KewlButton(
                             buttonText: 'Refresh',
@@ -333,7 +232,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                               refreshPatient();
                             },
                             margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                            isDisabled: isDisabled,
+                            isDisabled: _isDisabled,
                           ),
                           KewlButton(
                             buttonText: 'Delete',
@@ -341,7 +240,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                               delete();
                             },
                             margin: EdgeInsets.only(left: 10.0),
-                            isDisabled: currentPatient.isDeleted,
+                            isDisabled: _currentPatient.isDeleted,
                           ),
                         ],
                       ),
@@ -353,9 +252,7 @@ class _PatientDetailsState extends State<PatientDetails> {
           ),
           Container(
             padding: EdgeInsets.all(0.0),
-            margin: EdgeInsets.all(0.0),
-            width: 380.0,
-            height: 300.0,
+            margin: EdgeInsets.all(5.0),
             decoration: BoxDecoration(
                 border: Border.all(
                   color: Colors.blue,
@@ -374,7 +271,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                   ),
                 ),
                 PatientPhones(
-                  phones: currentPatient.phones,
+                  phones: _currentPatient.phones,
                 )
               ],
             ),
@@ -382,5 +279,101 @@ class _PatientDetailsState extends State<PatientDetails> {
         ],
       ),
     );
+  }
+
+  String validateFirstName(String value) {
+    String retval;
+    if (value.isEmpty) {
+      _currentPatient.firstName = value;
+      retval = 'First Name is a required field';
+    } else if (value != _currentPatient.firstName) {
+      _currentPatient.firstName = value;
+    }
+    return retval;
+  }
+
+  String validateLastName(String value) {
+    String retval;
+    if (value.isEmpty) {
+      _currentPatient.lastName = value;
+      retval = 'Last Name is a required field';
+    } else if (value != _currentPatient.lastName) {
+      _currentPatient.lastName = value;
+    }
+    return retval;
+  }
+
+  String validateEmail(String value) {
+    String retval;
+    String pattern =
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+    RegExp regExp = new RegExp(pattern);
+    if (!regExp.hasMatch(value)) {
+      retval = 'Please enter valid email';
+    } else if (value != _currentPatient.email) {
+      _currentPatient.email = value;
+    }
+    return retval;
+  }
+
+  void formDataChanged(String value) {
+    setState(() {
+      _isDisabled = !_formKey.currentState.validate();
+    });
+  }
+
+  void updatePatient() async {
+    bool saveResult;
+    saveResult = await putPatient(_currentPatient);
+    if (saveResult) {
+      Future<List<Patient>> patients = searchPatients(false, '');
+
+      // Tell the parent its data has changed and force a re-render
+      PatientData.of(context).setPatients(patients, _currentPatient);
+
+      setState(() {
+        _isDisabled = true;
+      });
+    }
+  }
+
+  void refreshPatient() {
+    PatientData.of(context).refreshCurrentPatient();
+  }
+
+  void delete() async {
+    bool saveResult;
+
+    saveResult = await showGeneralDialog(
+        barrierColor: Colors.black.withOpacity(0.3),
+        transitionBuilder: (context, a1, a2, widget) {
+          return Transform(
+            transform: Matrix4.translationValues(0.0, 200, 0.0),
+            child: ConfirmDeletionDialog(patient: _currentPatient),
+          );
+        },
+        transitionDuration: Duration(milliseconds: 400),
+        barrierDismissible: false,
+        barrierLabel: '',
+        context: context,
+        pageBuilder: (context, animation1, animation2) {
+          return SizedBox(height: 20.0);
+        });
+    if (saveResult) {
+      Future<List<Patient>> patients = searchPatients(false, '');
+
+      // Tell the parent its data has changed and force a re-render
+      PatientData.of(context).setPatients(patients, _currentPatient);
+      PatientData.of(context).refreshCurrentPatient();
+      setState(() {
+        _isDisabled = true;
+      });
+    }
+  }
+
+  void setPatientPhones(Future<List<Phone>> phones) {
+    setState(() {
+      phones = phones;
+    });
   }
 }

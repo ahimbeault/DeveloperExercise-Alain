@@ -1,10 +1,8 @@
-import 'dart:js';
 import 'dart:convert';
 import 'package:dio/dio.dart' as dioHttp;
 import 'package:patientapp/classes/enumerations.dart';
 import 'package:patientapp/models/patient.dart';
 import 'package:patientapp/api services/api-services.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_guid/flutter_guid.dart';
 import 'package:patientapp/environment.dart';
 
@@ -12,7 +10,8 @@ Future<List<Patient>> getPatients(bool includeDeleted) async {
   List<Patient> retval;
 
   try {
-    String url = BASE_URL + 'patient/GetPatients/' + includeDeleted.toString();
+    String url =
+        BASE_URL + 'patient?includeDeleted=' + includeDeleted.toString();
 
     dioHttp.Response response = await executeRequest(url, HttpMethod.GET, null);
 
@@ -32,13 +31,17 @@ Future<List<Patient>> getPatients(bool includeDeleted) async {
 
 Future<Patient> getPatient(Guid patientId) async {
   Patient retval;
+
   try {
-    String url = BASE_URL + 'patient/GetPatient/' + patientId.toString();
+    String url = BASE_URL + 'patient?patientId=' + patientId.toString();
 
     dioHttp.Response response = await executeRequest(url, HttpMethod.GET, null);
 
     if (response != null && response.statusCode == 200) {
-      retval = new Patient.fromJson(response.data);
+      retval = (response.data as List)
+          .map((patient) => new Patient.fromJson(patient))
+          .toList()
+          .first;
     } else {
       throw Exception('Failed to get Patient');
     }
@@ -54,9 +57,9 @@ Future<List<Patient>> searchPatients(bool includeDeleted, String search) async {
 
   try {
     String url = BASE_URL +
-        'patient/GetPatients/' +
+        'patient?includeDeleted=' +
         includeDeleted.toString() +
-        '/' +
+        '&search=' +
         search;
 
     dioHttp.Response response = await executeRequest(url, HttpMethod.GET, null);

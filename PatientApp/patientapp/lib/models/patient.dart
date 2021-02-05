@@ -1,5 +1,6 @@
 import 'package:flutter_guid/flutter_guid.dart';
 import 'package:patientapp/models/phone.dart';
+import 'package:flutter/material.dart';
 
 class Patient {
   Guid patientId;
@@ -10,13 +11,18 @@ class Patient {
   List<Phone> phones;
 
   Patient({
-    this.patientId,
-    this.firstName,
-    this.lastName,
-    this.email,
-    this.isDeleted,
-    this.phones,
-  });
+    Guid patientId,
+    String firstName = '',
+    @required String lastName,
+    String email = '',
+    bool isDeleted = false,
+    List<Phone> phones,
+  })  : this.patientId = patientId,
+        this.firstName = firstName,
+        this.lastName = lastName,
+        this.email = email,
+        this.isDeleted = isDeleted,
+        this.phones = phones;
 
   factory Patient.fromJson(Map<String, dynamic> json) {
     List<Phone> phones =
@@ -34,21 +40,15 @@ class Patient {
   }
 
   Map<String, dynamic> toJson() {
-    if (patientId != null) {
-      return {
-        'patientId': patientId.toString(),
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'isDeleted': isDeleted,
-      };
-    } else {
-      return {
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'isDeleted': isDeleted,
-      };
-    }
+    return {
+      if (patientId != null)
+        'patientId': patientId.toString()
+      else
+        'patientId': null,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'isDeleted': isDeleted,
+    };
   }
 }

@@ -45,87 +45,21 @@ namespace PatientApp.Services
             return retval;
         }
 
-        public Patient GetPatientById(Guid patientId)
+        public List<Patient> GetPatients(PatientFilter filter)
         {
-            Patient retval = null;
+            List<Patient> patients = null;
 
             try
             {
-                retval = _context.Patients
-                    .Include(p => p.Phones)
-                    .Where(p => p.PatientId == patientId)
-                    .FirstOrDefault();
-                    
+                patients = GetPatientList(filter);
             }
             catch(Exception e)
             {
-                Console.Write(e);
-            }
-
-            return retval;
-        }
-
-        public List<Patient> GetAllPatients(bool includeDeleted)
-        {
-            List<Patient> patients = null;
-
-            try
-            {
-                if (includeDeleted)
-                {
-                    patients = _context.Patients
-                        .Include(p=> p.Phones)
-                        .ToList();
-                }
-                else
-                {
-                    patients = _context.Patients
-                        .Include(p => p.Phones)
-                        .Where(p => !p.IsDeleted)
-                        .ToList();
-                }
-
-            }
-            catch (Exception e)
-            {
-                Console.Write(e);
+                Console.WriteLine(e);
             }
 
             return patients;
         }
-
-
-        public List<Patient> SearchPatients(bool includeDeleted, string search)
-        {
-            List<Patient> patients = null;
-
-            try
-            {
-                if (includeDeleted)
-                {
-                    patients = _context.Patients
-                        .Include(p => p.Phones)
-                        .Where(p=> p.LastName.ToLower().Contains(search.ToLower()) || p.FirstName.ToLower().Contains(search.ToLower()))
-                        .ToList();
-                }
-                else
-                {
-                    patients = _context.Patients
-                        .Include(p => p.Phones)
-                        .Where(p => !p.IsDeleted 
-                        && (p.LastName.ToLower().Contains(search.ToLower()) || p.FirstName.ToLower().Contains(search.ToLower()) ))
-                        .ToList();
-                }
-
-            }
-            catch (Exception e)
-            {
-                Console.Write(e);
-            }
-
-            return patients;
-        }
-
 
         public bool DeletePatient(Guid patientId)
         {
@@ -171,5 +105,115 @@ namespace PatientApp.Services
             return retval;
         }
         #endregion
+        #region Private Methods
+        private List<Patient> GetPatientList(PatientFilter filter)
+        {
+            List<Patient> patientList = null;
+
+            try
+            {
+                if (filter.patientId.HasValue)
+                {
+                    patientList = GetPatientById(filter.patientId.Value);
+                }
+                else if (!string.IsNullOrEmpty(filter.search))
+                {
+                    patientList = SearchPatients(filter.includeDeleted, filter.search);
+                }
+                else
+                {
+                    patientList = GetAllPatients(filter.includeDeleted);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return patientList;
+        }
+
+        private List<Patient> GetPatientById(Guid patientId)
+        {
+            List<Patient> retval = null;
+
+            try
+            {
+                retval = _context.Patients
+                    .Include(p => p.Phones)
+                    .Where(p => p.PatientId == patientId)
+                    .ToList();
+
+            }
+            catch (Exception e)
+            {
+                Console.Write(e);
+            }
+
+            return retval;
+        }
+
+        private List<Patient> GetAllPatients(bool includeDeleted)
+        {
+            List<Patient> patients = null;
+
+            try
+            {
+                if (includeDeleted)
+                {
+                    patients = _context.Patients
+                        .Include(p => p.Phones)
+                        .ToList();
+                }
+                else
+                {
+                    patients = _context.Patients
+                        .Include(p => p.Phones)
+                        .Where(p => !p.IsDeleted)
+                        .ToList();
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.Write(e);
+            }
+
+            return patients;
+        }
+
+
+        private List<Patient> SearchPatients(bool includeDeleted, string search)
+        {
+            List<Patient> patients = null;
+
+            try
+            {
+                if (includeDeleted)
+                {
+                    patients = _context.Patients
+                        .Include(p => p.Phones)
+                        .Where(p => p.LastName.ToLower().Contains(search.ToLower()) || p.FirstName.ToLower().Contains(search.ToLower()))
+                        .ToList();
+                }
+                else
+                {
+                    patients = _context.Patients
+                        .Include(p => p.Phones)
+                        .Where(p => !p.IsDeleted
+                        && (p.LastName.ToLower().Contains(search.ToLower()) || p.FirstName.ToLower().Contains(search.ToLower())))
+                        .ToList();
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.Write(e);
+            }
+
+            return patients;
+        }
+
+        #endregion 
     }
 }

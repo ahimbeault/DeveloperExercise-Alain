@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using PatientApp.Models;
 using PatientApp.Services;
 
@@ -24,64 +22,15 @@ namespace PatientApp.Controllers
         #endregion
 
         #region Public Methods
-
-        [HttpGet("GetPatients/{includeDeleted}")]
-        public ActionResult<string> GetPatients(bool includeDeleted)
+        [HttpGet]
+        public ActionResult<List<Patient>> Get([FromQuery] PatientFilter filter)
         {
-
-
-            ActionResult retval = BadRequest();
             List<Patient> patients = null;
-            try
-            {
-                patients = _patientService.GetAllPatients(includeDeleted);   
-                
-                if(patients != null)
-                {
-                    retval = new OkObjectResult(patients);
-                }
-                
-            }
-            catch (Exception e)
-            {
-                Console.Write(e);
-            }
-
-            return retval;
-        }
-
-        [HttpGet("GetPatient/{patientId}")]
-        public ActionResult<string> GetPatient(Guid patientId)
-        {
-            ActionResult retval = BadRequest();
-            Patient patient = null;
+            ActionResult retval = BadRequest(patients);
 
             try
             {
-                patient = _patientService.GetPatientById(patientId);
-
-                if(patient != null)
-                {
-                    retval = new OkObjectResult(patient);
-                }
-
-            }
-            catch (Exception e)
-            {
-                Console.Write(e);
-            }
-
-            return retval;
-        }
-
-        [HttpGet("GetPatients/{includeDeleted}/{search}")]
-        public ActionResult<string> GetPatientsSearch(bool includeDeleted, string search)
-        {
-            ActionResult retval = BadRequest();
-            List<Patient> patients = null;
-            try
-            {
-                patients = _patientService.SearchPatients(includeDeleted, search);
+                patients = _patientService.GetPatients(filter);
 
                 if (patients != null)
                 {
@@ -96,6 +45,78 @@ namespace PatientApp.Controllers
 
             return retval;
         }
+
+        //[HttpGet("GetPatients/{includeDeleted}")]
+        //public ActionResult<string> GetPatients(bool includeDeleted)
+        //{
+
+
+        //    ActionResult retval = BadRequest();
+        //    List<Patient> patients = null;
+        //    try
+        //    {
+        //        patients = _patientService.GetAllPatients(includeDeleted);   
+                
+        //        if(patients != null)
+        //        {
+        //            retval = new OkObjectResult(patients);
+        //        }
+                
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.Write(e);
+        //    }
+
+        //    return retval;
+        //}
+
+        //[HttpGet("GetPatient/{patientId}")]
+        //public ActionResult<string> GetPatient(Guid patientId)
+        //{
+        //    ActionResult retval = BadRequest();
+        //    Patient patient = null;
+
+        //    try
+        //    {
+        //        patient = _patientService.GetPatientById(patientId);
+
+        //        if(patient != null)
+        //        {
+        //            retval = new OkObjectResult(patient);
+        //        }
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.Write(e);
+        //    }
+
+        //    return retval;
+        //}
+
+        //[HttpGet("GetPatients/{includeDeleted}/{search}")]
+        //public ActionResult<string> GetPatientsSearch(bool includeDeleted, string search)
+        //{
+        //    ActionResult retval = BadRequest();
+        //    List<Patient> patients = null;
+        //    try
+        //    {
+        //        patients = _patientService.SearchPatients(includeDeleted, search);
+
+        //        if (patients != null)
+        //        {
+        //            retval = new OkObjectResult(patients);
+        //        }
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.Write(e);
+        //    }
+
+        //    return retval;
+        //}
 
 
 
