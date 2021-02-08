@@ -57,7 +57,7 @@ class Phone {
     }
 
     return {
-      if (phoneId != null) 'phoneId': phoneId.toString() else 'phoneId': null,
+      if (phoneId != null) 'phoneId': phoneId.toString(),
       'phoneType': phoneTypeString,
       'phoneNumber': phoneNumber,
       'patientId': patientId.toString(),

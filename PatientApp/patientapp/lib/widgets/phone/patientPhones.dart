@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:patientapp/classes/enumerations.dart';
 import 'package:patientapp/widgets/patient/patientBody.dart';
+import 'package:patientapp/widgets/patient/patientDetails.dart';
 import 'package:patientapp/models/patient.dart';
 import 'package:patientapp/models/phone.dart';
 import 'package:patientapp/api services/api-phone.dart';
@@ -24,6 +25,7 @@ class PatientPhones extends StatefulWidget {
 }
 
 class _PatientPhonesState extends State<PatientPhones> {
+  List<Phone> _phones;
   Phone _currentSelectedPhone;
   bool _isEditing;
   bool _saveEnabled;
@@ -31,6 +33,8 @@ class _PatientPhonesState extends State<PatientPhones> {
   @override
   void initState() {
     super.initState();
+
+    _currentSelectedPhone = null;
     _isEditing = false;
     _saveEnabled = false;
   }
@@ -38,6 +42,11 @@ class _PatientPhonesState extends State<PatientPhones> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _phones = PatientDetails.of(context).getCurrentPatientPhones();
+    _currentSelectedPhone = null;
+    _isEditing = false;
+    _saveEnabled = false;
+    print('phones changed');
   }
 
   @override
@@ -56,7 +65,7 @@ class _PatientPhonesState extends State<PatientPhones> {
                 itemCount: widget.phones.length,
                 itemBuilder: (BuildContext context, int index) {
                   return PhoneListItem(
-                    phone: widget.phones[index],
+                    phone: _phones[index],
                     currentSelectedPhone: _currentSelectedPhone,
                   );
                 },

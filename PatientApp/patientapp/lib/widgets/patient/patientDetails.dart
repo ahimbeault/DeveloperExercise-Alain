@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:patientapp/models/phone.dart';
 import 'package:patientapp/widgets/patient/patientBody.dart';
 import 'package:patientapp/models/patient.dart';
 import 'package:patientapp/widgets/shared/kewl-textfield.dart';
 import 'package:patientapp/widgets/shared/kewl-button.dart';
 import 'package:patientapp/api services/api-patient.dart';
 import 'package:patientapp/widgets/phone/patientPhones.dart';
-import 'package:patientapp/models/phone.dart';
 import 'package:patientapp/widgets/patient/confirmDeletionDialog.dart';
 
 class PatientDetails extends StatefulWidget {
@@ -13,6 +13,12 @@ class PatientDetails extends StatefulWidget {
 
   PatientDetails({Patient currentPatient})
       : this.currentPatient = currentPatient;
+
+  static _PatientDetailsState of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<PatientDetailsWidget>()
+        .patientDetails;
+  }
 
   @override
   _PatientDetailsState createState() => _PatientDetailsState();
@@ -54,7 +60,6 @@ class _PatientDetailsState extends State<PatientDetails> {
     Patient patient;
 
     // If the parent propogated a change, reflect it in this widget
-
     patient = PatientData.of(context).getCurrentPatient;
 
     _currentPatient = new Patient(
@@ -65,6 +70,7 @@ class _PatientDetailsState extends State<PatientDetails> {
       isDeleted: patient.isDeleted,
       phones: patient.phones,
     );
+
     _firstNameTextController =
         TextEditingController(text: _currentPatient.firstName);
 
@@ -88,195 +94,198 @@ class _PatientDetailsState extends State<PatientDetails> {
     return Container(
       padding: EdgeInsets.all(0.0),
       margin: EdgeInsets.all(0.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Form(
-            key: _formKey,
-            child: Container(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Divider(
-                    color: Colors.blue,
-                    thickness: 2.0,
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(left: 50.0, right: 50.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(0.0),
-                          margin: EdgeInsets.all(0.0),
-                          width: 500.0,
-                          height: 400.0,
-                          child: Column(
-                            children: [
-                              Container(
-                                  margin: EdgeInsets.all(10.0),
-                                  child: Text(
-                                    'Patient Id: ' +
-                                        _currentPatient.patientId.toString(),
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.blue),
-                                  )),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    child: Center(child: Text('Status:')),
-                                    width: 55.0,
-                                    height: 50.0,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey,
-                                      border: Border.all(
+      child: PatientDetailsWidget(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Flexible(
+              flex: 2,
+              child: Form(
+                key: _formKey,
+                child: Container(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Divider(
+                        color: Colors.blue,
+                        thickness: 2.0,
+                      ),
+                      Flexible(
+                        child: Container(
+                          margin: EdgeInsets.only(left: 50.0, right: 50.0),
+                          child: Container(
+                            padding: EdgeInsets.all(0.0),
+                            margin: EdgeInsets.all(0.0),
+                            child: Column(
+                              children: [
+                                Container(
+                                    margin: EdgeInsets.all(10.0),
+                                    child: Text(
+                                      'Patient Id: ' +
+                                          _currentPatient.patientId.toString(),
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.blue),
+                                    )),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      child: Center(child: Text('Status:')),
+                                      width: 55.0,
+                                      height: 50.0,
+                                      decoration: BoxDecoration(
                                         color: Colors.grey,
+                                        border: Border.all(
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Container(
-                                    child: (_currentPatient.isDeleted)
-                                        ? Center(child: Text('Inactive'))
-                                        : Center(child: Text('Active')),
-                                    width: 55.0,
-                                    height: 50.0,
-                                    decoration: BoxDecoration(
-                                      color: (_currentPatient.isDeleted)
-                                          ? Colors.red
-                                          : Colors.green,
-                                      border: Border.all(
+                                    Container(
+                                      child: (_currentPatient.isDeleted)
+                                          ? Center(child: Text('Inactive'))
+                                          : Center(child: Text('Active')),
+                                      width: 55.0,
+                                      height: 50.0,
+                                      decoration: BoxDecoration(
                                         color: (_currentPatient.isDeleted)
                                             ? Colors.red
                                             : Colors.green,
+                                        border: Border.all(
+                                          color: (_currentPatient.isDeleted)
+                                              ? Colors.red
+                                              : Colors.green,
+                                        ),
                                       ),
                                     ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 50.0,
+                                  width: 500.0,
+                                ),
+                                KewlTextField(
+                                  labelText: 'First Name',
+                                  hintText: 'Enter patient\'s first name',
+                                  minWidth: 300,
+                                  prefixIcon: Icon(
+                                    Icons.person,
+                                    color: Colors.indigo,
                                   ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 50.0,
-                                width: 500.0,
-                              ),
-                              KewlTextField(
-                                labelText: 'First Name',
-                                hintText: 'Enter patient\'s first name',
-                                minWidth: 300,
-                                prefixIcon: Icon(
-                                  Icons.person,
-                                  color: Colors.indigo,
+                                  textController: _firstNameTextController,
+                                  margin: EdgeInsets.only(bottom: 15.0),
+                                  onValidate: validateFirstName,
+                                  onChanged: formDataChanged,
+                                  maxTextCharacters: 50,
+                                  displayMaxCharacterValidation: true,
                                 ),
-                                textController: _firstNameTextController,
-                                margin: EdgeInsets.only(bottom: 15.0),
-                                onValidate: validateFirstName,
-                                onChanged: formDataChanged,
-                                maxTextCharacters: 50,
-                                displayMaxCharacterValidation: true,
-                              ),
-                              KewlTextField(
-                                labelText: 'Last Name',
-                                hintText: 'Enter patient\'s last name',
-                                minWidth: 300,
-                                prefixIcon: Icon(
-                                  Icons.person,
-                                  color: Colors.indigo,
+                                KewlTextField(
+                                  labelText: 'Last Name',
+                                  hintText: 'Enter patient\'s last name',
+                                  minWidth: 300,
+                                  prefixIcon: Icon(
+                                    Icons.person,
+                                    color: Colors.indigo,
+                                  ),
+                                  textController: _lastNameTextController,
+                                  margin: EdgeInsets.only(bottom: 15.0),
+                                  onValidate: validateLastName,
+                                  onChanged: formDataChanged,
+                                  maxTextCharacters: 50,
+                                  displayMaxCharacterValidation: true,
                                 ),
-                                textController: _lastNameTextController,
-                                margin: EdgeInsets.only(bottom: 15.0),
-                                onValidate: validateLastName,
-                                onChanged: formDataChanged,
-                                maxTextCharacters: 50,
-                                displayMaxCharacterValidation: true,
-                              ),
-                              KewlTextField(
-                                labelText: 'Email',
-                                hintText: 'Enter patient\'s eamil',
-                                minWidth: 300,
-                                prefixIcon: Icon(
-                                  Icons.email,
-                                  color: Colors.indigo,
+                                KewlTextField(
+                                  labelText: 'Email',
+                                  hintText: 'Enter patient\'s eamil',
+                                  minWidth: 300,
+                                  prefixIcon: Icon(
+                                    Icons.email,
+                                    color: Colors.indigo,
+                                  ),
+                                  textController: _emailTextController,
+                                  margin: EdgeInsets.only(bottom: 15.0),
+                                  onValidate: validateEmail,
+                                  onChanged: formDataChanged,
+                                  maxTextCharacters: 50,
+                                  displayMaxCharacterValidation: true,
                                 ),
-                                textController: _emailTextController,
-                                margin: EdgeInsets.only(bottom: 15.0),
-                                onValidate: validateEmail,
-                                onChanged: formDataChanged,
-                                maxTextCharacters: 50,
-                                displayMaxCharacterValidation: true,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 25.0, top: 15.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              KewlButton(
+                                buttonText: 'Save',
+                                callback: () {
+                                  updatePatient();
+                                },
+                                margin: EdgeInsets.only(right: 10.0),
+                                isDisabled: _isDisabled,
+                              ),
+                              KewlButton(
+                                buttonText: 'Refresh',
+                                callback: () {
+                                  refreshPatient();
+                                },
+                                margin:
+                                    EdgeInsets.only(left: 10.0, right: 10.0),
+                                isDisabled: _isDisabled,
+                              ),
+                              KewlButton(
+                                buttonText: 'Delete',
+                                callback: () {
+                                  delete();
+                                },
+                                margin: EdgeInsets.only(left: 10.0),
+                                isDisabled: _currentPatient.isDeleted,
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 25.0, top: 15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          KewlButton(
-                            buttonText: 'Save',
-                            callback: () {
-                              updatePatient();
-                            },
-                            margin: EdgeInsets.only(right: 10.0),
-                            isDisabled: _isDisabled,
-                          ),
-                          KewlButton(
-                            buttonText: 'Refresh',
-                            callback: () {
-                              refreshPatient();
-                            },
-                            margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                            isDisabled: _isDisabled,
-                          ),
-                          KewlButton(
-                            buttonText: 'Delete',
-                            callback: () {
-                              delete();
-                            },
-                            margin: EdgeInsets.only(left: 10.0),
-                            isDisabled: _currentPatient.isDeleted,
-                          ),
-                        ],
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-          Container(
-            padding: EdgeInsets.all(0.0),
-            margin: EdgeInsets.all(5.0),
-            decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.blue,
+            Flexible(
+              flex: 1,
+              child: Container(
+                padding: EdgeInsets.all(0.0),
+                margin: EdgeInsets.all(5.0),
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.blue,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.all(5.0),
+                      child: Text(
+                        'Phones',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    PatientPhones(
+                      phones: _currentPatient.phones,
+                    )
+                  ],
                 ),
-                borderRadius: BorderRadius.all(Radius.circular(20))),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  margin: EdgeInsets.all(5.0),
-                  child: Text(
-                    'Phones',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                PatientPhones(
-                  phones: _currentPatient.phones,
-                )
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
+        patientDetails: this,
       ),
     );
   }
@@ -371,9 +380,21 @@ class _PatientDetailsState extends State<PatientDetails> {
     }
   }
 
-  void setPatientPhones(Future<List<Phone>> phones) {
-    setState(() {
-      phones = phones;
-    });
+  List<Phone> getCurrentPatientPhones() {
+    return _currentPatient.phones;
+  }
+}
+
+class PatientDetailsWidget extends InheritedWidget {
+  final _PatientDetailsState patientDetails;
+  PatientDetailsWidget({
+    Widget child,
+    this.patientDetails,
+  }) : super(child: child);
+
+  @override
+  bool updateShouldNotify(PatientDetailsWidget oldWidget) {
+    print('detailsupdatedwoooot');
+    return true;
   }
 }

@@ -60,7 +60,8 @@ class _PatientDataState extends State<PatientData> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
+                    Flexible(
+                      flex: 1,
                       child: FutureBuilder<List<Patient>>(
                         future: _patients,
                         builder: (context, snapshot) {
@@ -81,7 +82,11 @@ class _PatientDataState extends State<PatientData> {
                         },
                       ),
                     ),
-                    PatientDetails(currentPatient: this._currentPatient),
+                    Flexible(
+                      flex: 2,
+                      child:
+                          PatientDetails(currentPatient: this._currentPatient),
+                    )
                   ],
                 ),
               ),

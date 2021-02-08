@@ -25,6 +25,34 @@ class _PhoneListItemState extends State<PhoneListItem> {
   bool _isEnabled;
 
   @override
+  void initState() {
+    super.initState();
+    _phone = new Phone(
+      phoneId: widget.phone.phoneId,
+      phoneNumber: widget.phone.phoneNumber,
+      phoneType: widget.phone.phoneType,
+      patientId: widget.phone.patientId,
+    );
+
+    if (_phone.phoneType == PhoneType.Home) {
+      _dropdownValue = 'Home';
+    } else if (_phone.phoneType == PhoneType.Work) {
+      _dropdownValue = 'Work';
+    } else {
+      _dropdownValue = 'Cell';
+    }
+
+    _isEnabled = false;
+    if (widget.currentSelectedPhone != null) {
+      if (widget.currentSelectedPhone.phoneId == _phone.phoneId) {
+        _isEnabled = true;
+      }
+    }
+
+    _phoneTextController = TextEditingController(text: _phone.phoneNumber);
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     Phone currentSelectedPhone =
@@ -32,7 +60,12 @@ class _PhoneListItemState extends State<PhoneListItem> {
 
     if (currentSelectedPhone == null ||
         currentSelectedPhone.phoneId != _phone.phoneId) {
-      _phone = widget.phone;
+      _phone = new Phone(
+        phoneId: widget.phone.phoneId,
+        phoneNumber: widget.phone.phoneNumber,
+        phoneType: widget.phone.phoneType,
+        patientId: widget.phone.patientId,
+      );
       if (_phone.phoneType == PhoneType.Home) {
         _dropdownValue = 'Home';
       } else if (_phone.phoneType == PhoneType.Work) {
@@ -109,7 +142,6 @@ class _PhoneListItemState extends State<PhoneListItem> {
   }
 
   void onDropdownChanged(String value) {
-    print(value);
     if (value == 'Cell') {
       _phone.phoneType = PhoneType.Cell;
     } else if (value == 'Home') {
@@ -146,32 +178,5 @@ class _PhoneListItemState extends State<PhoneListItem> {
       PatientPhones.of(context).setCurrentSelectedPhone(_phone);
       setState(() => {_isEnabled = true});
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _phone = new Phone(
-      phoneId: widget.phone.phoneId,
-      phoneNumber: widget.phone.phoneNumber,
-      phoneType: widget.phone.phoneType,
-    );
-
-    if (_phone.phoneType == PhoneType.Home) {
-      _dropdownValue = 'Home';
-    } else if (_phone.phoneType == PhoneType.Work) {
-      _dropdownValue = 'Work';
-    } else {
-      _dropdownValue = 'Cell';
-    }
-
-    _isEnabled = false;
-    if (widget.currentSelectedPhone != null) {
-      if (widget.currentSelectedPhone.phoneId == _phone.phoneId) {
-        _isEnabled = true;
-      }
-    }
-
-    _phoneTextController = TextEditingController(text: _phone.phoneNumber);
   }
 }

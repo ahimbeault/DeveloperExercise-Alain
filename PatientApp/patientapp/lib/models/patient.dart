@@ -41,10 +41,7 @@ class Patient {
 
   Map<String, dynamic> toJson() {
     return {
-      if (patientId != null)
-        'patientId': patientId.toString()
-      else
-        'patientId': null,
+      if (patientId != null) 'patientId': patientId.toString(),
       'firstName': firstName,
       'lastName': lastName,
       'email': email,
