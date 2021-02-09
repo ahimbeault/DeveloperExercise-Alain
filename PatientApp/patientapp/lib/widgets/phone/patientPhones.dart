@@ -33,7 +33,6 @@ class _PatientPhonesState extends State<PatientPhones> {
   @override
   void initState() {
     super.initState();
-
     _currentSelectedPhone = null;
     _isEditing = false;
     _saveEnabled = false;
@@ -42,81 +41,84 @@ class _PatientPhonesState extends State<PatientPhones> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _phones = PatientDetails.of(context).getCurrentPatientPhones();
+    _phones = List.from(PatientDetails.of(context).getCurrentPatientPhones());
     _currentSelectedPhone = null;
     _isEditing = false;
     _saveEnabled = false;
-    print('phones changed');
   }
 
   @override
   Widget build(BuildContext context) {
     return PatientPhonesWidget(
-      child: Container(
-        width: 400,
-        height: 250,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(18.0),
-                itemCount: widget.phones.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return PhoneListItem(
-                    phone: _phones[index],
-                    currentSelectedPhone: _currentSelectedPhone,
-                  );
-                },
-              ),
+      child: Column(
+        children: [
+          Container(
+            width: 400,
+            height: 400,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(18.0),
+                    itemCount: _phones.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return PhoneListItem(
+                        phone: _phones[index],
+                        currentSelectedPhone: _currentSelectedPhone,
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.add_circle_outline_sharp),
+                        tooltip: 'Add new phone',
+                        onPressed: (_isEditing)
+                            ? null
+                            : () {
+                                addNewPhone();
+                              },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.save),
+                        tooltip: 'Save Phone',
+                        onPressed: (_isEditing && _saveEnabled)
+                            ? () {
+                                savePhone();
+                              }
+                            : null,
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.undo),
+                        tooltip: 'Undo',
+                        onPressed: (_isEditing)
+                            ? () {
+                                undoChanges();
+                              }
+                            : null,
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        tooltip: 'Delete',
+                        onPressed: (_isEditing || _currentSelectedPhone == null)
+                            ? null
+                            : () {
+                                delete();
+                              },
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
-            Container(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.add_circle_outline_sharp),
-                    tooltip: 'Add new phone',
-                    onPressed: (_isEditing)
-                        ? null
-                        : () {
-                            addNewPhone();
-                          },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.save),
-                    tooltip: 'Save Phone',
-                    onPressed: (_isEditing && _saveEnabled)
-                        ? () {
-                            savePhone();
-                          }
-                        : null,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.undo),
-                    tooltip: 'Undo',
-                    onPressed: (_isEditing)
-                        ? () {
-                            undoChanges();
-                          }
-                        : null,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    tooltip: 'Delete',
-                    onPressed: (_isEditing || _currentSelectedPhone == null)
-                        ? null
-                        : () {
-                            delete();
-                          },
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
+          ),
+        ],
       ),
       patientPhones: this,
     );
@@ -143,18 +145,15 @@ class _PatientPhonesState extends State<PatientPhones> {
   }
 
   void addNewPhone() {
-    Patient patient = PatientData.of(context).getCurrentPatient;
     Phone newPhone = new Phone(
       phoneType: PhoneType.Cell,
       phoneNumber: '',
     );
-    List<Phone> newPhoneList = List.from(widget.phones);
+    List<Phone> newPhoneList =
+        List.from(PatientDetails.of(context).getCurrentPatientPhones());
     newPhoneList.add(newPhone);
-
-    patient.phones = newPhoneList;
-    PatientData.of(context).setCurrentPatient(patient);
-
     setState(() => {
+          _phones = newPhoneList,
           _currentSelectedPhone = newPhone,
           _isEditing = true,
           _saveEnabled = false,

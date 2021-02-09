@@ -11,7 +11,6 @@ namespace PatientApp.Services
         #region Private Variables
         private DatabaseContext _context;
         #endregion
-
         #region Constructor
 
         public PhoneService (DatabaseContext context)
@@ -26,9 +25,7 @@ namespace PatientApp.Services
             }
         }
         #endregion
-
         #region Public Methods
-
         public bool AddPhone(Phone phone)
         {
             bool retval = false;
@@ -119,9 +116,6 @@ namespace PatientApp.Services
             return retval;
 
         }
-
         #endregion
-
-
     }
 }

@@ -131,6 +131,12 @@ class _PatientDataState extends State<PatientData> {
     });
   }
 
+  void setIncludeDeleted(bool includeDeleted) {
+    setState(() {
+      _includeDeleted = includeDeleted;
+    });
+  }
+
   Widget loading() {
     return Container(
       width: 300.0,

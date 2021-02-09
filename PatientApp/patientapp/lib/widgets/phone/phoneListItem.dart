@@ -57,9 +57,10 @@ class _PhoneListItemState extends State<PhoneListItem> {
     super.didChangeDependencies();
     Phone currentSelectedPhone =
         PatientPhones.of(context).getCurrentSelectedPhone();
+    bool isEditing = PatientPhones.of(context).getIsEditing();
 
     if (currentSelectedPhone == null ||
-        currentSelectedPhone.phoneId != _phone.phoneId) {
+        (!isEditing && currentSelectedPhone.phoneId != _phone.phoneId)) {
       _phone = new Phone(
         phoneId: widget.phone.phoneId,
         phoneNumber: widget.phone.phoneNumber,
@@ -84,46 +85,53 @@ class _PhoneListItemState extends State<PhoneListItem> {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: EdgeInsets.all(10.0),
-            child: DropdownButton<String>(
-              items: <String>['Cell', 'Home', 'Work']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              value: _dropdownValue,
-              icon: Icon(Icons.arrow_downward),
-              iconSize: 10,
-              onChanged: (_isEnabled)
-                  ? (String newValue) {
-                      onDropdownChanged(newValue);
-                      setState(() => {_dropdownValue = newValue});
-                    }
-                  : null,
+          Flexible(
+            flex: 1,
+            child: Container(
+              child: DropdownButton<String>(
+                items: <String>['Cell', 'Home', 'Work']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                value: _dropdownValue,
+                icon: Icon(Icons.arrow_downward),
+                iconSize: 10,
+                onChanged: (_isEnabled)
+                    ? (String newValue) {
+                        onDropdownChanged(newValue);
+                        setState(() => {_dropdownValue = newValue});
+                      }
+                    : null,
+              ),
             ),
           ),
-          Container(
-            padding: EdgeInsets.all(10.0),
-            child: KewlTextField(
-              labelText: 'Phone Number',
-              hintText: 'Enter phone number',
-              minWidth: 200,
-              maxWidth: 200,
-              prefixIcon: Icon(
-                Icons.phone,
-                color: Colors.indigo,
+          Flexible(
+            flex: 3,
+            child: Container(
+              padding: EdgeInsets.all(10.0),
+              child: KewlTextField(
+                labelText: 'Phone Number',
+                hintText: 'Enter phone number',
+                minWidth: 50,
+                maxWidth: 200,
+                prefixIcon: Icon(
+                  Icons.phone,
+                  color: Colors.indigo,
+                ),
+                textController: _phoneTextController,
+                onChanged: onPhoneChanged,
+                onValidate: validatePhoneNumber,
+                onFocus: phoneNumberFocus,
+                onLostFocus: phoneNumberLostFocus,
+                margin: EdgeInsets.only(bottom: 15.0),
+                maxTextCharacters: 10,
+                displayMaxCharacterValidation: false,
+                digitsOnly: true,
+                enabled: _isEnabled,
               ),
-              textController: _phoneTextController,
-              onChanged: onPhoneChanged,
-              onValidate: validatePhoneNumber,
-              margin: EdgeInsets.only(bottom: 15.0),
-              maxTextCharacters: 10,
-              displayMaxCharacterValidation: false,
-              digitsOnly: true,
-              enabled: _isEnabled,
             ),
           ),
         ],
@@ -178,5 +186,26 @@ class _PhoneListItemState extends State<PhoneListItem> {
       PatientPhones.of(context).setCurrentSelectedPhone(_phone);
       setState(() => {_isEnabled = true});
     }
+  }
+
+  void phoneNumberLostFocus(String phoneNumber) {
+    String newValue;
+    if (phoneNumber.isNotEmpty && phoneNumber.length == 10) {
+      StringBuffer newText = StringBuffer();
+      newText.write('(' + phoneNumber.substring(0, 3) + ') ');
+      newText.write(phoneNumber.substring(3, 6) + '-');
+      newText.write(phoneNumber.substring(6, 10));
+      newValue = newText.toString();
+      setState(
+          () => {_phoneTextController = TextEditingController(text: newValue)});
+    }
+  }
+
+  void phoneNumberFocus() {
+    String newValue;
+    String phoneNumber = _phone.phoneNumber;
+    newValue = phoneNumber.replaceAll(new RegExp("[^\\d]"), "");
+    setState(
+        () => {_phoneTextController = TextEditingController(text: newValue)});
   }
 }

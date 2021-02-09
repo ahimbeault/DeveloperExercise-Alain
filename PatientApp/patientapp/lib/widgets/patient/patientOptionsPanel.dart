@@ -112,5 +112,6 @@ class _OptionPanelState extends State<OptionPanel> {
 
     // Tell the parent its data has changed and force a re-render
     PatientData.of(context).setPatients(patients, null);
+    PatientData.of(context).setIncludeDeleted(_includeDeleted);
   }
 }

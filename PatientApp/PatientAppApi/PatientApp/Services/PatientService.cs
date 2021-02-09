@@ -12,7 +12,6 @@ namespace PatientApp.Services
         #region Private Variables
         private DatabaseContext _context;
         #endregion
-
         #region Constructor
         public PatientService(DatabaseContext context)
         {
@@ -26,9 +25,7 @@ namespace PatientApp.Services
             }
         }
         #endregion
-
         #region Public Methods
-
         public bool AddPatient(Patient patient)
         {
             bool retval = false;
@@ -182,7 +179,6 @@ namespace PatientApp.Services
             return patients;
         }
 
-
         private List<Patient> SearchPatients(bool includeDeleted, string search)
         {
             List<Patient> patients = null;
@@ -213,7 +209,6 @@ namespace PatientApp.Services
 
             return patients;
         }
-
         #endregion 
     }
 }

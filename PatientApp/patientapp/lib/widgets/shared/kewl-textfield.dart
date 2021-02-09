@@ -8,6 +8,8 @@ class KewlTextField extends StatelessWidget {
   final double maxWidth;
   final Function(String) onChanged;
   final Function(String) onValidate;
+  final Function() onFocus;
+  final Function(String) onLostFocus;
   final TextEditingController textController;
   final Icon prefixIcon;
   final EdgeInsets margin;
@@ -24,6 +26,8 @@ class KewlTextField extends StatelessWidget {
     double maxWidth = double.infinity,
     Function(String) onChanged,
     Function(String) onValidate,
+    Function() onFocus,
+    Function(String) onLostFocus,
     TextEditingController textController,
     Icon prefixIcon = const Icon(null),
     EdgeInsets margin = const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
@@ -38,6 +42,8 @@ class KewlTextField extends StatelessWidget {
         this.maxWidth = maxWidth,
         this.onChanged = onChanged,
         this.onValidate = onValidate,
+        this.onFocus = onFocus,
+        this.onLostFocus = onLostFocus,
         this.textController = textController,
         this.prefixIcon = prefixIcon,
         this.margin = margin,
@@ -52,38 +58,47 @@ class KewlTextField extends StatelessWidget {
     return Container(
       constraints: BoxConstraints(minWidth: minWidth, maxWidth: maxWidth),
       margin: margin,
-      child: TextFormField(
-        controller: textController,
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          contentPadding: textPadding,
-          hintText: hintText,
-          labelText: labelText,
-          prefixIcon: prefixIcon,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15.0),
-            borderSide: BorderSide(color: Colors.green, width: 2.0),
+      child: Focus(
+        onFocusChange: (hasFocus) {
+          if (!hasFocus && onLostFocus != null) {
+            onLostFocus(textController.value.text);
+          } else if (onFocus != null) {
+            onFocus();
+          }
+        },
+        child: TextFormField(
+          controller: textController,
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            contentPadding: textPadding,
+            hintText: hintText,
+            labelText: labelText,
+            prefixIcon: prefixIcon,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15.0),
+              borderSide: BorderSide(color: Colors.green, width: 2.0),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15.0),
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15.0),
+              borderSide: BorderSide(color: Colors.pink),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15.0),
+              borderSide: BorderSide(color: Colors.red),
+            ),
           ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15.0),
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15.0),
-            borderSide: BorderSide(color: Colors.pink),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15.0),
-            borderSide: BorderSide(color: Colors.red),
-          ),
+          validator: onValidate,
+          maxLength: (displayMaxCharacterValidation) ? maxTextCharacters : null,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(maxTextCharacters),
+            if (digitsOnly) FilteringTextInputFormatter.digitsOnly,
+          ],
+          enabled: enabled,
         ),
-        validator: onValidate,
-        maxLength: (displayMaxCharacterValidation) ? maxTextCharacters : null,
-        inputFormatters: [
-          LengthLimitingTextInputFormatter(maxTextCharacters),
-          if (digitsOnly) FilteringTextInputFormatter.digitsOnly,
-        ],
-        enabled: enabled,
       ),
     );
   }

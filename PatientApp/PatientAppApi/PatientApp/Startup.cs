@@ -86,7 +86,7 @@ namespace PatientApp
         {
             // This list of origins will need to contain the URL of the finished front end project (ex. www.furious7.com)
             string[] origins = {
-                "http://localhost:61459",
+                "http://localhost:56168",
                 "http://172.18.0.1:4201",
                 "http://172.18.0.2:4201",
                 "http://172.18.0.3:4201",

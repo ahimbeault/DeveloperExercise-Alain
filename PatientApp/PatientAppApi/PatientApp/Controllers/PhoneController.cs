@@ -15,14 +15,12 @@ namespace PatientApp.Controllers
         #region Private Variables
         private readonly PhoneService _phoneService;
         #endregion
-
         #region Constructors
         public PhoneController(PhoneService phoneService)
         {
             _phoneService = phoneService;
         }
         #endregion
-
         #region Public Methods
         [HttpGet("{patientId}")]
         public List<Phone> GetPhonesForPatient(Guid patientId)

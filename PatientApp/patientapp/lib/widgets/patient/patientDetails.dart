@@ -235,7 +235,7 @@ class _PatientDetailsState extends State<PatientDetails> {
                                 },
                                 margin:
                                     EdgeInsets.only(left: 10.0, right: 10.0),
-                                isDisabled: _isDisabled,
+                                isDisabled: _currentPatient == null,
                               ),
                               KewlButton(
                                 buttonText: 'Delete',
@@ -243,7 +243,8 @@ class _PatientDetailsState extends State<PatientDetails> {
                                   delete();
                                 },
                                 margin: EdgeInsets.only(left: 10.0),
-                                isDisabled: _currentPatient.isDeleted,
+                                isDisabled: (_currentPatient == null ||
+                                    _currentPatient.isDeleted),
                               ),
                             ],
                           ),
@@ -347,6 +348,7 @@ class _PatientDetailsState extends State<PatientDetails> {
   }
 
   void refreshPatient() {
+    PatientData.of(context).refreshPatients();
     PatientData.of(context).refreshCurrentPatient();
   }
 
@@ -394,7 +396,6 @@ class PatientDetailsWidget extends InheritedWidget {
 
   @override
   bool updateShouldNotify(PatientDetailsWidget oldWidget) {
-    print('detailsupdatedwoooot');
     return true;
   }
 }
